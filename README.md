@@ -5,7 +5,18 @@
 ```bash
 conda create -n odcdr python=3.12 -y
 
-pip install paddlepaddle paddleocr fastapi uvicorn python-multipart jinja2 python-dotenv openai you-get -i https://pypi.tuna.tsinghua.edu.cn/simple
+pip install \
+-i https://pypi.tuna.tsinghua.edu.cn/simple \
+    paddlepaddle \
+    paddleocr \
+    fastapi \
+    uvicorn \
+    python-multipart \
+    jinja2 \
+    python-dotenv \
+    openai \
+    you-get \
+    ffmpeg-python
 
 ```
 
@@ -41,3 +52,9 @@ print(completion.model_dump_json())
 # 在项目根目录创建 .env 文件
 DASHSCOPE_API_KEY=***
 ```
+
+## BiliBili 视频下载
+
+### 音视频合并-ffmpeg
+
+[安装ffmpeg](https://github.com/BtbN/FFmpeg-Builds/releases)

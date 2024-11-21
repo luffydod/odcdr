@@ -4,6 +4,65 @@ import time
 from you_get import common as you_get
 import os
 import sys
+import ffmpeg
+
+# 设置 ffmpeg 路径
+ffmpeg._run.DEFAULT_FFMPEG_PATH = r'F:\apps_collection\ffmpeg\bin\ffmpeg.exe'
+
+def merge_audio_video(video_name):
+    """
+    使用 ffmpeg-python 合并音频和视频文件
+    :param video_name: 视频文件名（不包含[00]或[01]后缀）
+    """
+    # 构建文件路径
+    video_path = f'./static/videos/{video_name}[00].mp4'
+    audio_path = f'./static/videos/{video_name}[01].mp4'
+    output_path = f'./static/videos/{video_name}.mp4'
+
+    print(f"视频文件: {video_path}")
+    print(f"音频文件: {audio_path}")
+    print(f"输出文件: {output_path}")
+
+    # 检查源文件是否存在
+    if not os.path.exists(video_path):
+        print(f"错误：视频文件不存在: {video_path}")
+        return False
+    if not os.path.exists(audio_path):
+        print(f"错误：音频文件不存在: {audio_path}")
+        return False
+    
+    try:
+        # 使用 subprocess 直接调用 ffmpeg
+        import subprocess
+        cmd = [
+            ffmpeg._run.DEFAULT_FFMPEG_PATH,
+            '-i', video_path,
+            '-i', audio_path,
+            '-c:v', 'copy',
+            '-c:a', 'copy',
+            '-y',
+            output_path
+        ]
+        
+        process = subprocess.run(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+        
+        if process.returncode == 0:
+            print(f"音视频合并完成：{output_path}")
+            os.remove(video_path)
+            os.remove(audio_path)
+            return True
+        else:
+            print(f"FFmpeg 错误输出:\n{process.stderr}")
+            return False
+            
+    except Exception as e:
+        print(f"执行 FFmpeg 命令时出错: {str(e)}")
+        return False
 
 class BilibiliUpMonitor:
     def __init__(self):
@@ -97,12 +156,13 @@ if __name__ == '__main__':
     # UP主的uid
     up_uid = '346563107'  
     
+    merge_audio_video('魔幻加拿大印度抗议：白人滚回欧洲，加拿大是我们印度的！')
     # 创建监控器实例
-    monitor = BilibiliUpMonitor()
+    # monitor = BilibiliUpMonitor()
     
     # 开始监控UP主的最新视频
-    monitor.monitor_up_latest_videos(
-        uid=up_uid,
-        check_interval=3600*24, # 每24小时检查一次
-        save_path='static/videos'
-    )
+    # monitor.monitor_up_latest_videos(
+    #     uid=up_uid,
+    #     check_interval=3600*24, # 每24小时检查一次
+    #     save_path='static/videos'
+    # )
