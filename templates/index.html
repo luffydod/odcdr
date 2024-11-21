@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OCR 文字识别</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <!-- 添加 Markdown 渲染相关的库 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- 添加代码高亮支持 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.8.0/styles/github.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.8.0/lib/highlight.min.js"></script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <div class="header-top">
+                <img src="/static/images/logo.png" alt="网站Logo" class="site-logo">
+                <h1 class="site-title">OCR项目</h1>
+            </div>
+            <nav class="main-nav">
+                <ul class="nav-list">
+                    <li class="nav-item"><a href="/" class="active">主页</a></li>
+                    <li class="nav-item"><a href="/image-ocr">图片文本识别</a></li>
+                    <li class="nav-item"><a href="/video-ocr">视频文本识别</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        <!-- 简介部分 -->
+        <section id="intro">
+            <h2>简介</h2>
+            <p>本项目是基于PaddleOCR的文字识别项目，主要用于识别图片中的文字。</p>
+        </section>
+
+        <!-- 添加对话展示区域 -->
+        <div class="chat-container">
+            <div class="chat-messages" id="chatMessages">
+                <!-- 消息将动态插入这里 -->
+            </div>
+            
+            <!-- 原有的聊天输入区域 -->
+            <div class="chat-input-container">
+                <div class="input-wrapper">
+                    <textarea id="chatInput" placeholder="请输入您的问题😁"></textarea>
+                    <button id="expandBtn" class="expand-btn">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                </div>
+                <div class="bottom-controls">
+                    <span id="charCount">0/2000</span>
+                    <button id="sendBtn" class="send-btn">发送</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加Font Awesome图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <!-- 添加JavaScript文件 -->
+    <script src="/static/js/chat.js"></script>
+</body>
+</html>

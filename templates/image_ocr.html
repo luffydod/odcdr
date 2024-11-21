@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OCR 文字识别</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-container">
+            <div class="header-top">
+                <img src="/static/images/logo.png" alt="网站Logo" class="site-logo">
+                <h1 class="site-title">OCR项目</h1>
+            </div>
+            <nav class="main-nav">
+                <ul class="nav-list">
+                    <li class="nav-item"><a href="/">主页</a></li>
+                    <li class="nav-item"><a href="/image-ocr" class="active">图片文本识别</a></li>
+                    <li class="nav-item"><a href="/video-ocr">视频文本识别</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <div class="container">
+        
+        <div class="upload-section">
+            <div class="file-input-wrapper">
+                <input type="file" id="imageFile" accept="image/*">
+            </div>
+        </div>
+
+        <div class="preview-container">
+            <div id="imageContainer">
+                <img id="previewImage">
+                <div id="selectionBox"></div>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="btn-reset" onclick="resetSelection()">重置选择</button>
+            <button class="btn-recognize" onclick="recognizeSelection()">识别选中区域</button>
+            <button class="btn-full" onclick="recognizeFullImage()">识别完整图片</button>
+        </div>
+
+        <div id="result"></div>
+    </div>
+
+    <script src="/static/js/image_ocr.js"></script>
+</body>
+</html>
