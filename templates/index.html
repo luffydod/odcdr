@@ -28,29 +28,52 @@
         </div>
     </header>
     <div class="container">
-        <!-- 简介部分 -->
-        <section id="intro">
-            <h2>简介</h2>
-            <p>本项目是基于PaddleOCR的文字识别项目，主要用于识别图片中的文字。</p>
-        </section>
-
-        <!-- 添加对话展示区域 -->
-        <div class="chat-container">
-            <div class="chat-messages" id="chatMessages">
-                <!-- 消息将动态插入这里 -->
+        <!-- 历史记录滚动区域 -->
+        <div class="history-scroll-container">
+            <button class="scroll-btn scroll-left" id="scrollLeft">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            
+            <div class="history-wrapper">
+                <div class="chat-history" id="chatHistory">
+                    <!-- 更多历史记录将在这里动态显示 -->
+                </div>
             </div>
             
-            <!-- 原有的聊天输入区域 -->
-            <div class="chat-input-container">
-                <div class="input-wrapper">
-                    <textarea id="chatInput" placeholder="请输入您的问题😁"></textarea>
-                    <button id="expandBtn" class="expand-btn">
-                        <i class="fas fa-expand"></i>
-                    </button>
+            <button class="scroll-btn scroll-right" id="scrollRight">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+        
+        <!-- 添加新对话按钮区域 -->
+        <div class="new-chat-container">
+            <button class="new-chat-btn">
+                <i class="fas fa-plus"></i>
+                创建新对话
+            </button>
+        </div>
+        
+        <!-- 主要内容区域 -->
+        <div class="main-content">
+            <div class="chat-container">
+                <!-- 消息显示区域 -->
+                <div class="chat-messages" id="chatMessages">
+                    <!-- 消息将动态插入这里 -->
+                    
                 </div>
-                <div class="bottom-controls">
-                    <span id="charCount">0/2000</span>
-                    <button id="sendBtn" class="send-btn">发送</button>
+                
+                <!-- 输入区域 -->
+                <div class="chat-input-container">
+                    <div class="input-wrapper">
+                        <textarea id="chatInput" placeholder="请输入您的问题😁"></textarea>
+                        <button id="expandBtn" class="expand-btn">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                    </div>
+                    <div class="bottom-controls">
+                        <span id="charCount">0/2000</span>
+                        <button id="sendBtn" class="send-btn">发送</button>
+                    </div>
                 </div>
             </div>
         </div>
