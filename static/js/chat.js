@@ -9,6 +9,7 @@ class ChatHistory {
         this.addMessageToChat = window.addMessage;
         this.setupScrollButtons();
         this.setupNewChatButton();
+        this.setupConfirmDialog();
     }
 
     setupContextMenu() {
@@ -28,6 +29,13 @@ class ChatHistory {
         const history = JSON.parse(localStorage.getItem('chatHistory') || '[]');
         this.historyContainer.innerHTML = '';
         
+        // 按时间倒序排列历史记录
+        history.sort((a, b) => {
+            const timeA = new Date(b.lastUpdated || b.timestamp);
+            const timeB = new Date(a.lastUpdated || a.timestamp);
+            return timeA - timeB;
+        });
+        
         history.forEach(chat => {
             this.addHistoryItem(chat);
         });
@@ -38,8 +46,8 @@ class ChatHistory {
         historyItem.className = 'history-item';
         historyItem.setAttribute('data-chat-id', chat.id);
         historyItem.innerHTML = `
-            <div class="timestamp">${new Date(chat.timestamp).toLocaleString()}</div>
-            <div class="preview">${chat.messages[0].content.substring(0, 50)}...</div>
+            <div class="history-content">${chat.messages[0].content.substring(0, 12)}...</div>
+            <div class="history-time">${new Date(chat.timestamp).toLocaleString()}</div>
         `;
         
         // 添加点击事件
@@ -83,8 +91,64 @@ class ChatHistory {
         });
     }
 
-    deleteChat(chatId) {
-        if (confirm('确定要删除这条对话记录吗？')) {
+    setupConfirmDialog() {
+        this.confirmDialog = document.getElementById('confirmDialog');
+        this.confirmDialog.querySelector('.close-btn').addEventListener('click', () => {
+            this.hideConfirmDialog();
+        });
+        
+        // 点击对话框外部关闭
+        this.confirmDialog.addEventListener('click', (e) => {
+            if (e.target === this.confirmDialog) {
+                this.hideConfirmDialog();
+            }
+        });
+    }
+
+    showConfirmDialog(chatId) {
+        return new Promise((resolve) => {
+            // 先隐藏右键菜单
+            this.contextMenu.style.display = 'none';
+            
+            // 显示确认弹窗
+            this.confirmDialog.classList.add('show');
+            
+            const confirmBtn = this.confirmDialog.querySelector('.confirm-btn');
+            const cancelBtn = this.confirmDialog.querySelector('.cancel-btn');
+            
+            const handleConfirm = () => {
+                this.hideConfirmDialog();
+                resolve(true);
+                cleanup();
+            };
+            
+            const handleCancel = () => {
+                this.hideConfirmDialog();
+                resolve(false);
+                cleanup();
+            };
+            
+            const cleanup = () => {
+                confirmBtn.removeEventListener('click', handleConfirm);
+                cancelBtn.removeEventListener('click', handleCancel);
+            };
+            
+            confirmBtn.addEventListener('click', handleConfirm);
+            cancelBtn.addEventListener('click', handleCancel);
+        });
+    }
+
+    hideConfirmDialog() {
+        this.confirmDialog.classList.remove('show');
+    }
+
+    async deleteChat(chatId) {
+        // 确保在显示确认弹窗前隐藏右键菜单
+        this.contextMenu.style.display = 'none';
+        
+        const confirmed = await this.showConfirmDialog(chatId);
+        
+        if (confirmed) {
             // 从localStorage中删除
             const history = JSON.parse(localStorage.getItem('chatHistory') || '[]');
             const updatedHistory = history.filter(chat => chat.id !== chatId);
@@ -128,9 +192,9 @@ class ChatHistory {
                 };
                 const historyItem = this.historyContainer.querySelector(`[data-chat-id="${this.currentChatId}"]`);
                 if (historyItem) {
-                    historyItem.querySelector('.preview').textContent = 
+                    historyItem.querySelector('.history-content').textContent = 
                         `${messages[0].content.substring(0, 50)}...`;
-                    historyItem.querySelector('.timestamp').textContent = 
+                    historyItem.querySelector('.history-time').textContent = 
                         new Date().toLocaleString();
                 }
             }
@@ -159,6 +223,18 @@ class ChatHistory {
     }
 
     loadChat(chat) {
+        // 每次加载聊天记录时，先刷新整个历史记录列表
+        this.loadHistory();
+        
+        // 从最新的历史记录中获取当前聊天
+        const history = JSON.parse(localStorage.getItem('chatHistory') || '[]');
+        const latestChat = history.find(item => item.id === chat.id);
+        
+        // 如果找到最新数据，使用最新数据
+        if (latestChat) {
+            chat = latestChat;
+        }
+
         const chatMessages = document.getElementById('chatMessages');
         chatMessages.innerHTML = '';
         
@@ -175,9 +251,10 @@ class ChatHistory {
         
         // 更新active状态
         this.historyContainer.querySelectorAll('.history-item').forEach(item => {
-            item.classList.remove('active');
             if (item.getAttribute('data-chat-id') === String(chat.id)) {
                 item.classList.add('active');
+            } else {
+                item.classList.remove('active');
             }
         });
     }
@@ -410,10 +487,9 @@ document.addEventListener('DOMContentLoaded', function() {
             addMessage(message, true);
             showTypingIndicator();
             
-            // 获取当前对话历史并转换为正确的格式
+            // 获取当前对话历史
             const currentMessages = chatHistoryManager.getCurrentChat();
             
-            // 使用原来的请求格式
             const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: {
@@ -421,10 +497,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: JSON.stringify({
                     message: message,
-                    history: currentMessages.map(msg => ({
-                        content: msg.content,
-                        isUser: msg.role === 'user'
-                    }))
+                    history: currentMessages
                 })
             });
             
@@ -441,15 +514,15 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 addMessage(data.response, false);
                 
-                // 更新当前对话历史（使用内部格式）
-                const updatedMessages = [...chatHistoryManager.currentChat];
-                updatedMessages.push(
+                // 修改这里：正确构建新的消息数组
+                const newMessages = [
+                    ...chatHistoryManager.currentChat,
                     { role: 'user', content: message },
                     { role: 'assistant', content: data.response }
-                );
+                ];
                 
                 // 保存更新后的对话
-                chatHistoryManager.saveChat(updatedMessages);
+                chatHistoryManager.saveChat(newMessages);
             }
             
         } catch (error) {
