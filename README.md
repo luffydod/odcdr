@@ -1,4 +1,15 @@
-# PaddleOCR+CURSOR 体验
+# ChatChat
+
+## 介绍
+
+当前项目实现了一个基于通义千问的智能聊天机器人，并集成了OCR文字识别功能。
+
+### ToDo
+
+- bilibili视频字幕提取
+- 图文总结
+- ocr功能优化
+- 公式识别
 
 ## Windows端环境配置记录
 
@@ -18,6 +29,62 @@ pip install \
     you-get \
     ffmpeg-python
 
+```
+
+## Docker 部署
+
+### Python 3.12
+
+```Dockerfile
+FROM ubuntu:20.04
+# 设置语言环境和时区
+ENV LC_ALL=C.UTF-8 \
+    LANG=C.UTF-8 \
+    TZ=Asia/Shanghai
+# 配置时区链接
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+ARG DEBIAN_FRONTEND=noninteractive
+RUN sed 's/\/.*com/\/\/mirrors.aliyun.com/g' /etc/apt/sources.list -i
+
+RUN apt-get update && apt-get install -y \
+    build-essential cmake && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    software-properties-common \
+    && add-apt-repository ppa:deadsnakes/ppa
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3.12 python3.12-dev python3.12-venv python3.12-distutils \
+    && ln -sf /usr/bin/python3.12 /usr/bin/python \
+    && python -m ensurepip --upgrade \
+    && python -m pip install --upgrade pip \
+    && apt-get clean \ 
+    && rm -rf /var/lib/apt/lists/* /etc/apt/sources.list.d/deadsnakes-ppa*
+```
+
+## 项目依赖镜像
+
+```Dockerfile
+FROM pybase:v0.1
+
+RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple \
+    paddlepaddle \
+    paddleocr \
+    fastapi \
+    uvicorn \
+    python-multipart \
+    jinja2 \
+    python-dotenv \
+    openai \
+    you-get \
+    ffmpeg-python
+
+WORKDIR /app
+
+COPY . /app
+
+CMD ["python", "main.py"]
 ```
 
 ## 通义千问note
