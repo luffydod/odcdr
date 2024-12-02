@@ -86,7 +86,8 @@ async def chat(request: ChatRequest):
         # 调用通义千问API
         try:
             completion = client.chat.completions.create(
-                model="qwen-plus",
+                # model="qwen-plus",
+                model="qwen-max",
                 messages=messages
             )
             
